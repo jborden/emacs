@@ -1,0 +1,430 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+ <head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title>Types</title>
+
+ </head>
+ <body><div class="manualnavbar" style="text-align: center;">
+ <div class="prev" style="text-align: left; float: left;"><a href="mongocursor.valid.html">MongoCursor::valid</a></div>
+ <div class="next" style="text-align: right; float: right;"><a href="class.mongoid.html">MongoId</a></div>
+ <div class="up"><a href="book.mongo.html">Mongo</a></div>
+ <div class="home"><a href="index.html">PHP Manual</a></div>
+</div><hr /><div id="mongo.types" class="part">
+
+ <h1>Types</h1>
+<h2>Table of Contents</h2><ul class="chunklist chunklist_part"><li><a href="class.mongoid.html">MongoId</a></li><li><a href="class.mongocode.html">MongoCode</a></li><li><a href="class.mongodate.html">MongoDate</a></li><li><a href="class.mongoregex.html">MongoRegex</a></li><li><a href="class.mongobindata.html">MongoBinData</a></li><li><a href="class.mongoint32.html">MongoInt32</a></li><li><a href="class.mongoint64.html">MongoInt64</a></li><li><a href="class.mongodbref.html">MongoDBRef</a></li><li><a href="class.mongominkey.html">MongoMinKey</a></li><li><a href="class.mongomaxkey.html">MongoMaxKey</a></li><li><a href="class.mongotimestamp.html">MongoTimestamp</a></li></ul>
+
+
+ <div class="partintro">
+
+  <div class="section">
+   <h2 class="title">Change in number handling</h2>
+   <p class="para">
+    <em class="emphasis">
+     The default behavior for numbers will be changing in version 1.1.0.  For
+     most programmers, this will make the driver&#039;s numeric handling smoother and
+     more natural, but it may require updating application code to work.
+    </em>
+   </p>
+   <p class="para">
+    The backwards-breaking changes will be related to the serialization and 
+    deserialization of integers.  You can test how these changes will affect 
+    your code by specifying the .ini changes now: mongo.native_int and 
+    mongo.long_as_object will default to <b><tt>TRUE</tt></b>.
+   </p>
+   <p class="para">
+    Serialization: by default pre-1.1.0, all PHP integers are serialized as 
+    32-bit integers, even on 64-bit machines.  This means that large numbers get
+    silently truncated.  In 1.1.0, 64-bit machines will, by default, save 
+    integers as 64-bit integers.  32-bit machines will continue to save integers
+    as 32-bit integers (you can also use the <a href="class.mongoint32.html" class="classname">MongoInt32</a> 
+    and <a href="class.mongoint64.html" class="classname">MongoInt64</a> classes to use 32-bit int on a 64-bit
+    machine or visa versa).
+   </p>
+   <p class="para">
+    Deserialization: by default pre-1.1.0, 64-bit integers will be deserialized 
+    as doubles.  This is not a perfect mapped and means they will be resaved as 
+    the wrong type (double instead of 64-bit integer).  In 1.1.0, 64-bit 
+    integers will be returned as <a href="class.mongoint64.html" class="classname">MongoInt64</a>&#039;s on 32-bit
+    machines.
+   </p>
+  </div>
+
+  <div class="section">
+   <p class="para">
+    MongoDB allows programmers to save and query for data expressed in all of the 
+    basic PHP types, compound types (arrays, associative arrays, and objects), and
+    a half-dozen classes provided by the MongoDB PHP driver (for regular 
+    expressions, dates, and other specialized applications).
+   </p>
+  </div>
+
+  <div class="section">
+    <h2 class="title">Simple Types</h2>
+    <p class="para">
+     The built-in types are:
+    </p>
+    <p class="para">
+     <table class="doctable informaltable">
+      
+       <thead valign="middle">
+        <tr valign="middle">
+         <th>Type</th>
+         <th>Description</th>
+         <th>Size in MongoDB (bytes)</th>
+        </tr>
+
+       </thead>
+
+       <tbody valign="middle" class="tbody">
+        <tr valign="middle">
+         <td align="left"><b><tt>NULL</tt></b></td>
+         <td align="left">Fairly self-explanatory.</td>
+         <td align="left">0</td>
+        </tr>
+
+        <tr valign="middle">
+         <td align="left">boolean</td>
+         <td align="left"><b><tt>TRUE</tt></b> and <b><tt>FALSE</tt></b></td>
+         <td align="left">1</td>
+        </tr>
+
+        <tr valign="middle">
+         <td align="left">int</td>
+         <td align="left">Integer values.</td>
+         <td align="left">4</td>
+        </tr>
+
+        <tr valign="middle">
+         <td align="left">float</td>
+         <td align="left">Double values.</td>
+         <td align="left">8</td>
+        </tr>
+
+        <tr valign="middle">
+         <td align="left">string</td>
+         <td align="left">Strings of UTF-8 characters.</td>
+         <td align="left">string length + 1</td>
+        </tr>
+
+       </tbody>
+      
+     </table>
+
+    </p>
+  </div>
+
+  <div class="section">
+   <h2 class="title">Arrays and Objects</h2>
+
+   <p class="para">
+    Arrays and objects can also be saved to the database.  An array with ascending
+    numeric keys will be saved as a an array, anything else will be saved as an
+    object.
+   </p>
+
+   <div class="example-contents">
+    <div class="phpcode"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /><br /></span><span style="color: #FF8000">//&nbsp;$scores&nbsp;will&nbsp;be&nbsp;saved&nbsp;as&nbsp;an&nbsp;array<br /></span><span style="color: #0000BB">$scores&nbsp;</span><span style="color: #007700">=&nbsp;array(</span><span style="color: #0000BB">98</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">100</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">73</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">85</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$collection</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">insert</span><span style="color: #007700">(array(</span><span style="color: #DD0000">"scores"&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">$scores</span><span style="color: #007700">));<br /><br /></span><span style="color: #FF8000">//&nbsp;$scores&nbsp;will&nbsp;be&nbsp;saved&nbsp;as&nbsp;an&nbsp;object<br /></span><span style="color: #0000BB">$scores&nbsp;</span><span style="color: #007700">=&nbsp;array(</span><span style="color: #DD0000">"quiz1"&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">98</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">"midterm"&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">100</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">"quiz2"&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">73</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">"final"&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">85</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$collection</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">insert</span><span style="color: #007700">(array(</span><span style="color: #DD0000">"scores"&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">$scores</span><span style="color: #007700">));<br /><br /></span><span style="color: #0000BB">?&gt;</span>
+</span>
+</code></div>
+   </div>
+
+
+   <p class="para">
+    If you query for these objects using the database shell, they will look like:
+    <div class="example-contents">
+     <div class="cdata"><pre>
+&gt; db.students.find()
+{ &quot;_id&quot; : ObjectId(&quot;4b06beada9ad6390dab17c43&quot;), &quot;scores&quot; : [ 98, 100, 73, 85 ] }
+{ &quot;_id&quot; : ObjectId(&quot;4b06bebea9ad6390dab17c44&quot;), &quot;scores&quot; : { &quot;quiz1&quot; : 98, &quot;midterm&quot; : 100, &quot;quiz2&quot; : 73, &quot;final&quot; : 85 } }
+</pre></div>
+    </div>
+
+   </p>
+
+   <p class="para">
+    The database can also save arbitrary PHP objects (although they will be 
+    returned as associative arrays).  The fields are used for the key/value
+    pairs.  For example, a blog post might look like:
+    <div class="example-contents">
+     <div class="phpcode"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /><br />&nbsp;&nbsp;</span><span style="color: #FF8000">//&nbsp;the&nbsp;blog&nbsp;post&nbsp;class<br />&nbsp;&nbsp;</span><span style="color: #007700">class&nbsp;</span><span style="color: #0000BB">Post&nbsp;</span><span style="color: #007700">{<br /><br />&nbsp;&nbsp;var&nbsp;</span><span style="color: #0000BB">$author</span><span style="color: #007700">;<br />&nbsp;&nbsp;var&nbsp;</span><span style="color: #0000BB">$content</span><span style="color: #007700">;<br />&nbsp;&nbsp;var&nbsp;</span><span style="color: #0000BB">$comments&nbsp;</span><span style="color: #007700">=&nbsp;array();<br />&nbsp;&nbsp;var&nbsp;</span><span style="color: #0000BB">$date</span><span style="color: #007700">;<br /><br />&nbsp;&nbsp;public&nbsp;function&nbsp;</span><span style="color: #0000BB">__construct</span><span style="color: #007700">(</span><span style="color: #0000BB">$author</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">$content</span><span style="color: #007700">)&nbsp;{<br />&nbsp;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">author&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">$author</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">content&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">$content</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">date&nbsp;</span><span style="color: #007700">=&nbsp;new&nbsp;</span><span style="color: #0000BB">MongoDate</span><span style="color: #007700">();<br />&nbsp;&nbsp;}<br /><br />&nbsp;&nbsp;public&nbsp;function&nbsp;</span><span style="color: #0000BB">setTitle</span><span style="color: #007700">(</span><span style="color: #0000BB">$title</span><span style="color: #007700">)&nbsp;{<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">title&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">$title</span><span style="color: #007700">;<br />&nbsp;&nbsp;}<br />}<br /><br /></span><span style="color: #FF8000">//&nbsp;create&nbsp;a&nbsp;simple&nbsp;blog&nbsp;post&nbsp;and&nbsp;insert&nbsp;it&nbsp;into&nbsp;the&nbsp;database<br /></span><span style="color: #0000BB">$post1&nbsp;</span><span style="color: #007700">=&nbsp;new&nbsp;</span><span style="color: #0000BB">Post</span><span style="color: #007700">(</span><span style="color: #DD0000">"Adam"</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">"This&nbsp;is&nbsp;a&nbsp;blog&nbsp;post"</span><span style="color: #007700">);<br /><br /></span><span style="color: #0000BB">$blog</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">insert</span><span style="color: #007700">(</span><span style="color: #0000BB">$post1</span><span style="color: #007700">);<br /><br /><br /></span><span style="color: #FF8000">//&nbsp;there&nbsp;is&nbsp;nothing&nbsp;restricting&nbsp;the&nbsp;type&nbsp;of&nbsp;the&nbsp;"author"&nbsp;field,&nbsp;so&nbsp;we&nbsp;can&nbsp;make&nbsp;<br />//&nbsp;it&nbsp;a&nbsp;nested&nbsp;object<br /></span><span style="color: #0000BB">$author&nbsp;</span><span style="color: #007700">=&nbsp;array(</span><span style="color: #DD0000">"name"&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">"Fred"</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">"karma"&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">42</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$post2&nbsp;</span><span style="color: #007700">=&nbsp;new&nbsp;</span><span style="color: #0000BB">Post</span><span style="color: #007700">(</span><span style="color: #0000BB">$author</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">"This&nbsp;is&nbsp;another&nbsp;blog&nbsp;post."</span><span style="color: #007700">);<br /><br /></span><span style="color: #FF8000">//&nbsp;we&nbsp;create&nbsp;an&nbsp;extra&nbsp;field&nbsp;by&nbsp;setting&nbsp;the&nbsp;title<br /></span><span style="color: #0000BB">$post2</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">setTitle</span><span style="color: #007700">(</span><span style="color: #DD0000">"Second&nbsp;Post"</span><span style="color: #007700">);<br /><br /></span><span style="color: #0000BB">$blog</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">insert</span><span style="color: #007700">(</span><span style="color: #0000BB">$post2</span><span style="color: #007700">);<br /><br /></span><span style="color: #0000BB">?&gt;</span>
+</span>
+</code></div>
+    </div>
+
+   </p>
+
+   <p class="para">
+    From the database shell, this will look something like:
+    <div class="example-contents">
+<div class="cdata"><pre>
+&gt; db.blog.find()
+{ &quot;_id&quot; : ObjectId(&quot;4b06c263edb87a281e09dad8&quot;), &quot;author&quot; : &quot;Adam&quot;, &quot;content&quot; : &quot;This is a blog post&quot;, &quot;comments&quot; : [ ], &quot;date&quot; : &quot;Fri Nov 20 2009 11:22:59 GMT-0500 (EST)&quot; }
+{ &quot;_id&quot; : ObjectId(&quot;4b06c282edb87a281e09dad9&quot;), &quot;author&quot; : { &quot;name&quot; : &quot;Fred&quot;, &quot;karma&quot; : 42 }, &quot;content&quot; : &quot;This is a blog post&quot;, &quot;comments&quot; : [ ], &quot;date&quot; : &quot;Fri Nov 20 2009 11:23:30 GMT-0500 (EST)&quot;, &quot;title&quot; : &quot;Second Post&quot; }
+</pre></div>
+    </div>
+
+   </p>
+
+   <p class="para">
+    The driver will not detect reference loops in arrays and objects.  For 
+    example, this will give a fatal error:
+    <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /><br />$collection</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">insert</span><span style="color: #007700">(</span><span style="color: #0000BB">$GLOBALS</span><span style="color: #007700">);<br /><br /></span><span style="color: #0000BB">?&gt;</span>
+</span>
+</code></div>
+    </div>
+
+    <div class="example-contents">
+<div class="cdata"><pre>
+
+Fatal error: Nesting level too deep - recursive dependency?
+
+</pre></div>
+    </div>
+
+    If you need to insert documents that may have recursive dependency, you have
+    to check for it yourself before passing it to the driver.
+   </p>
+  </div>
+
+  <div class="section">
+   <h2 class="title">MongoDB Types</h2>
+
+   <p class="para">
+    The Mongo PHP driver also defines a few new types to use with the database.
+    See class documentation for details and examples.
+   </p>
+   <p class="para">
+    <table class="doctable informaltable">
+     
+      <thead valign="middle">
+       <tr valign="middle">
+        <th>Type</th>
+        <th>Description</th>
+        <th>Size in MongoDB (bytes)</th>
+       </tr>
+
+      </thead>
+
+      <tbody valign="middle" class="tbody">
+       <tr valign="middle">
+        <td align="left"><a href="class.mongobindata.html" class="classname">MongoBinData</a></td>
+        <td align="left">Binary data.</td>
+        <td align="left">Number of bytes in binary data + 5</td>
+       </tr>
+
+       <tr valign="middle">
+        <td align="left"><a href="class.mongocode.html" class="classname">MongoCode</a></td>
+        <td align="left">JavaScript code.</td>
+        <td align="left">String length of code + object size of scope.</td>
+       </tr>
+
+       <tr valign="middle">
+        <td align="left"><a href="class.mongodate.html" class="classname">MongoDate</a></td>
+        <td align="left">Dates and times.  Stored as milliseconds since the epoch.</td>
+        <td align="left">8</td>
+       </tr>
+
+       <tr valign="middle">
+        <td align="left"><a href="class.mongoid.html" class="classname">MongoId</a></td>
+        <td align="left">Unique document id:
+         <ul class="itemizedlist">
+          <li class="listitem">
+           <p class="para">4 bytes of timestamp</p>
+           <p class="para">
+            No two records can have the same id if they were inserted at different 
+            times.
+           </p>
+          </li>
+          <li class="listitem">
+           <p class="para">3 bytes machine id</p>
+           <p class="para">
+            No two records can have the same id if they were inserted on different 
+            machines
+           </p>
+          </li>
+          <li class="listitem">
+           <p class="para">2 bytes thread id</p>
+           <p class="para">
+            No two records can have the same id if they were inserted by different 
+            threads running on the same machine.
+           </p>
+          </li>
+          <li class="listitem">
+           <p class="para">3 bytes incrementing value</p>
+           <p class="para">
+            Each time an id is created, a global counter is incremented and used
+            as the increment value of the next id.  
+           </p>
+          </li>
+         </ul>
+         Thus, no two records can have the same id unless a single process on a
+         single machine managed to insert 256^3 (over 16 million) documents in
+         one second, overflowing the increment field.
+        </td>
+        <td align="left">12</td>
+       </tr>
+
+       <tr valign="middle">
+        <td align="left"><a href="class.mongominkey.html" class="classname">MongoMinKey</a></td>
+        <td align="left">Always smaller than any other value.</td>
+        <td align="left">String length of code + object size of scope.</td>
+       </tr>
+
+       <tr valign="middle">
+        <td align="left"><a href="class.mongomaxkey.html" class="classname">MongoMaxKey</a></td>
+        <td align="left">JavaScript code.</td>
+        <td align="left">Always larger than any other value.</td>
+       </tr>
+
+       <tr valign="middle">
+        <td align="left"><a href="class.mongoregex.html" class="classname">MongoRegex</a></td>
+        <td align="left">Regular expressions.</td>
+        <td align="left">
+         Number of characters in regular expression + number of flags
+        </td>
+       </tr>
+
+       <tr valign="middle">
+        <td align="left"><a href="class.mongotimestamp.html" class="classname">MongoTimestamp</a></td>
+        <td align="left">Replication timestamp</td>
+        <td align="left">8</td>
+       </tr>
+
+      </tbody>
+     
+    </table>
+
+   </p>
+  </div>
+
+  <div class="section">
+   <h2 class="title">BSON</h2>
+   <p class="para">
+    MongoDB uses a storage format called &quot;BSON,&quot; Binary Serializable Object 
+    Notation, which is similar to JSON but more compact and rich in types. Listed
+    below is the exact byte size of each type (or information required to compute 
+    its size, in the case of variable-length types).  Keep in mind that these
+    sizes do not include field names. The size of an object can be manually
+    computed, but it may be easier for programmers to call the 
+    <span class="function"><a href="function.bson-encode.html" class="function">bson_encode()</a></span> function and take the length of the resulting
+    string.
+   </p>
+   <p class="para">
+    An example of manually computing BSON size for saving the object 
+    array(&quot;x&quot; =&gt; null, &quot;y&quot; =&gt; 40):
+    <div class="example-contents">
+     <div class="cdata"><pre>
+4 bytes (object size)
+
+1 byte  (type of &quot;x&quot; field)
+2 bytes (&quot;x&quot; and &quot;\0&quot;)
+0 bytes (for null)
+
+1 byte  (type of &quot;y&quot; field)
+2 bytes (&quot;y&quot; and &quot;\0&quot;)
+4 bytes (for an integer)
+
+1 byte  (end-of-object byte)
+-----------------------
+15 bytes
+</pre></div>
+    </div>
+
+   </p>
+  </div>
+
+ </div>
+
+ 
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+</div>
+<hr /><div class="manualnavbar" style="text-align: center;">
+ <div class="prev" style="text-align: left; float: left;"><a href="mongocursor.valid.html">MongoCursor::valid</a></div>
+ <div class="next" style="text-align: right; float: right;"><a href="class.mongoid.html">MongoId</a></div>
+ <div class="up"><a href="book.mongo.html">Mongo</a></div>
+ <div class="home"><a href="index.html">PHP Manual</a></div>
+</div></body></html>

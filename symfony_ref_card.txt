@@ -1,0 +1,53 @@
+#(re)building the doctrine models
+james$ symfony doctrine:build --all --and-load --no-confirmation
+# If big changes to schema, remove both old lib/model AND form
+#lib/form/doctrine forms! Also, be sure to update you schema.yml file!
+#get properties from GuardUser in templates
+$sf_user->getGuardUser()->getProperty;
+#how does @route work?
+@route_name - name of route for url_for, etc.
+ex: url_for(@default?module=job&action=show&id='.$job->getId())
+#how does link_to work?
+link_to($text_to_display, 'route', $object)
+# show routes of application
+$ symfony app:routes frontend
+# clean out class files which no longer exist in schema.yml
+$ symfony doctrine:clean
+# These are good for when you have problems with loading tables using
+#the command "$ symfony doctrine:build --all --and-load --no-confirmation"
+$ symfony doctrine:insert-sql
+# reuibld sql
+$ symfony doctrine:build --sql
+#the error ERROR 1005 (HY000): Can't create table 'runtab.#sql-7f_4b6'
+#(errno: 121) may refer to the fact that foreign key names have
+
+
+# it is a good idea to just clean everything, without loading any
+#fixturesdata.
+$symfony doctrine:build --all (WITHOUT --and-load)
+# When there are problems with fixture data, have symfony load only
+#SPECIFIC fixture yml files
+# wildcards * work as well
+$ symfony doctrine:data-load data/fixtures/FIXTURE.yml
+# BE CAREFUL ABOUT LOADING MULTIPLE .yml files! data that is needed
+#from one file may not be loaded for another!
+# MAKE SURE ALL schema.sql and fixtures.sql are in one dir... check plugins!
+
+#you can trace errors by giving cli the  --trace option
+$ symfony doctrine:data-load --trace
+
+# better to delete a coloumn from a schema.yml file and let symfony
+# handle a foreign key!
+
+#Use this for testing debugging DQL statements
+#on Objects
+$ symfony doctrine:dql "FROM Course"
+
+
+# An Example of a join. 
+$ symfony doctrine:dql "SELECT g.name from RuntabGroup g LEFT JOIN g.RuntabGroupRunner rg WHERE rg.uid = 4"
+         ^^^^^^^^^^^^^^^^^^^^
+	 In the underlined section above, you are using the
+	 relationship that the MODEL RuntabGroupRunner, using the
+	 alias rg, has with RuntabGroup. 
+

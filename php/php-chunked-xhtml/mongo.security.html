@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+ <head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title>Security</title>
+
+ </head>
+ <body><div class="manualnavbar" style="text-align: center;">
+ <div class="prev" style="text-align: left; float: left;"><a href="mongo.configuration.html">php.ini Options</a></div>
+ <div class="next" style="text-align: right; float: right;"><a href="mongo.testing.html">Running the Driver's Tests</a></div>
+ <div class="up"><a href="mongo.manual.html">Manual</a></div>
+ <div class="home"><a href="index.html">PHP Manual</a></div>
+</div><hr /><div id="mongo.security" class="section">
+ <h2 class="title">Security</h2>
+
+ <div class="section">
+  <h2 class="title">Request Injection Attacks</h2>
+  <p class="para">
+   If you are passing <i>$_GET</i> parameters to your queries, make 
+   sure that they are cast to strings first.  Users can insert associative 
+   arrays in GET requests, which could then become unwanted $-queries.
+  </p>
+
+  <p class="para">
+   A fairly innocuous example: suppose you are looking up a user&#039;s information
+   with the request <em class="emphasis">http://www.example.com?username=bob</em>. 
+   Your application does the query 
+   <i>$collection-&gt;find(array(&quot;username&quot; =&gt; $_GET[&#039;username&#039;]))</i>. 
+  </p>
+
+  <p class="para">
+   Someone could subvert this by getting 
+   <em class="emphasis">http://www.example.com?username[$ne]=foo</em>, which PHP 
+   will magically turn into an associative array, turning your query into
+   <i>$collection-&gt;find(array(&quot;username&quot; =&gt; array(&#039;$ne&#039; =&gt; &quot;foo&quot;)))</i>,
+   which will return all users not named &quot;foo&quot; (all of your users, probably).
+  </p>
+
+  <p class="para">
+   This is a fairly easy attack to defend against: make sure $_GET&#039;s parameters
+   are the type you expect before you send them to the database (cast them to
+   strings, in this case).
+  </p>
+
+  <p class="para">
+   Thanks to <a href="http://www.idontplaydarts.com/2010/07/mongodb-is-vulnerable-to-sql-injection-in-php-at-least/" class="link external">&raquo; Phil</a> for pointing this out.
+  </p>
+
+  <p class="para">
+   See <a href="http://dochub.mongodb.org/core/security" class="link external">&raquo; the main documentation</a>
+   for more information about SQL-injection-like issues with MongoDB.
+  </p>
+ </div>
+
+</div><hr /><div class="manualnavbar" style="text-align: center;">
+ <div class="prev" style="text-align: left; float: left;"><a href="mongo.configuration.html">php.ini Options</a></div>
+ <div class="next" style="text-align: right; float: right;"><a href="mongo.testing.html">Running the Driver's Tests</a></div>
+ <div class="up"><a href="mongo.manual.html">Manual</a></div>
+ <div class="home"><a href="index.html">PHP Manual</a></div>
+</div></body></html>

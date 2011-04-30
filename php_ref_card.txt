@@ -1,0 +1,2 @@
+M-Tab - Autocomplete function name
+C-c C-f - Search PHP manual using identifier at point (from docs at www.php.net)
