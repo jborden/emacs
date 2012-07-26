@@ -15,3 +15,14 @@
 ;; important: needed to load flymake with the mode
 (add-hook 'find-file-hook 'flymake-mode)
 
+;; For Javascript flymake
+;; this is using a v8-compiled jslint
+;; see http://koansys.com/tech/flymake-mode-for-emacs-javascript-v8-edition
+;;(require 'flymake-jslint)
+;;(add-hook 'javascript-mode-hook
+;;	  (lambda () (flymake-mode 1)))
+
+;; clears out a hook
+(setq javascript-mode-hook nil)
+;; Turn off java flymake, for now
+(delete '("\\.java\\'" flymake-simple-make-java-init flymake-simple-java-cleanup) flymake-allowed-file-name-masks)

@@ -7,3 +7,8 @@
 ;; set M-x to C-x C-m to
 (global-set-key "\C-x\C-m" 'execute-extended-command)
 (global-set-key "\C-c\C-m" 'execute-extended-command)
+;; Set C-l to goto-line
+(global-set-key "\C-l" 'goto-line)
+;; Set C-x C
+(global-set-key "\C-x p" 'other-window-backward)
+

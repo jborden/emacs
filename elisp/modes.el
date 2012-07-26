@@ -1,8 +1,8 @@
 ;; modes.el
 ;; James Borden
 ;; settings for different modes
-
 ;; Path which contains php manual 
+;; Remember: hooks are variables, not functions!
 (setq php-manual-path "~/emacs/php-chunked-xhtml")
 ;; Path for php-completion-file
 (setq php-completion-file "~/emacs/php/php-completion-file")
@@ -24,7 +24,28 @@
 (require 'org-install)
 ;; Hooks for org-mode
 (add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
+(add-hook 'org-mode-hook 'auto-fill-mode)
 ;; Many commands in Org work on the region if the region is active. 
 ;; To make use of this, you need to have transient-mark-mode (zmacs-regions in XEmacs) turned on. 
 ;;In Emacs 23 this is the default, in Emacs 22 you need to do this yourself with
 (transient-mark-mode 1)
+;; use nxhtml-mode for *.html, *.css, *.php and *.js
+(add-to-list 'auto-mode-alist '("\\.html" . html-mode))
+(add-to-list 'auto-mode-alist '("\\.css" . css-mode))
+(require 'php-mode)
+(add-to-list 'auto-mode-alist '("\\.php" . php-mode))
+(add-to-list 'auto-mode-alist '("\\.js" . javascript-mode))
+;; Use four spaces for tabs 
+(setq tab-width 4)
+(setq indent-tabs-mode t)
+;; use octave-mode for *.m files
+(add-to-list 'auto-mode-alist '("\\.m" . octave-mode))
+;; use my own javac minor mode when loading java files
+(add-hook 'java-mode-hook 'javac-mode)
+;; use rainbow mode when editing css files
+(add-hook 'css-mode-hook 'rainbow-mode)
+;; setup slime 
+(setq inferior-lisp-program "/usr/local/bin/clisp") ; your Lisp system
+(add-to-list 'load-path "~/emacs/slime")  ; your SLIME directory
+(require 'slime)
+(slime-setup)
