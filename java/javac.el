@@ -48,7 +48,7 @@ Special Commands:
     (shell-command javac-command)
     ;; end of javac-compile-class
     )
-(defun javac-run-java ()
+  (defun javac-run-java ()
   "Run the command line java on a .java file as a class with the curent javac-classpath"
   (interactive)
   (setq class-name (split-string buffer-file-name "\\/" ))          ;; split up the filename to remove dir information
@@ -69,7 +69,7 @@ Special Commands:
   (setq temp-dir 
 	(read-directory-name "Dir to add to javac-classpath: "))
   (list temp-dir)
-  (setq javac-classpath (concat javac-classpath ":" (expand-file-name temp-dir)))
+  (setq javac-classpath (concat javac-classpath ":" (expand-file-name temp-dir) "*" ) )
   ;; save the javac-classpath between sessions
   (customize-save-variable 'javac-classpath javac-classpath)
   ;; end of javac-add-dir-to-javac-classpath

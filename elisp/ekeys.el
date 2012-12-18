@@ -11,4 +11,7 @@
 (global-set-key "\C-l" 'goto-line)
 ;; Set C-x C
 (global-set-key "\C-x p" 'other-window-backward)
-
+;; Scroll forward with C-f
+(global-set-key "\C-f" 'scroll-up-command)
+;; Scroll backward with C-b
+(global-set-key "\C-b" 'scroll-down-command)

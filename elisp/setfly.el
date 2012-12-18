@@ -26,3 +26,7 @@
 (setq javascript-mode-hook nil)
 ;; Turn off java flymake, for now
 (delete '("\\.java\\'" flymake-simple-make-java-init flymake-simple-java-cleanup) flymake-allowed-file-name-masks)
+;; customize what files flymake is allowed to handle
+(setq flymake-allowed-file-name-masks 
+      '(("\\.php[345]?\\'" flymake-php-init) ; for now, only php will have flymake run for it
+	))
