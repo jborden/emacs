@@ -49,3 +49,6 @@
 (add-to-list 'load-path "~/emacs/slime")  ; your SLIME directory
 (require 'slime)
 (slime-setup)
+;; uses paraedit mode on lisps
+(add-hook 'clojure-mode 'paredit-mode)
+
