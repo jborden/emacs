@@ -1,11 +1,11 @@
 
 ;;; clojurescript-mode.el --- Major mode for ClojureScript code
 
-;; Copyright (C) 2011 Luke Amdor, 2012 Andrew Mains
+;; Copyright (C) 2011 Luke Amdor, 2012 Andrew Mains, 2013 James Borden
 ;;
-;; Authors: Luke Amdor <luke.amdor@gmail.com>, Andrew Mains <amains12@gmail.com>
+;; Authors: Luke Amdor <luke.amdor@gmail.com>, Andrew Mains <amains12@gmail.com>, James Borden <jmborden@gmail.com>
 ;; URL: http://github.com/rubbish/clojurescript-mode
-;; Version: 0.1
+;; Version: 0.2
 ;; Keywords: languages, lisp, javascript
 
 ;; This file is not part of GNU Emacs.
@@ -79,29 +79,70 @@
   (interactive)
   (unless (get-buffer-process clojurescript-repl-buffer-name)    
     (inferior-cljs (cljs-repl-command)))
-  
   (pop-to-buffer clojurescript-repl-buffer-name))
 
+;; cljs-defun-at-point and cljs-region-for-defun-at-point 
+;; are from slime, but renamed so as to be independent of slime
+ (defun cljs-defun-at-point ()
+   "Return the text of the defun at point."
+   (apply #'buffer-substring-no-properties
+          (cljs-region-for-defun-at-point)))
 
+ (defun cljs-region-for-defun-at-point ()
+   "Return the start and end position of defun at point."
+   (save-excursion
+     (save-match-data
+       (end-of-defun)
+       (let ((end (point)))
+         (beginning-of-defun)
+         (list (point) end)))))
+
+;; todo: run command in ns without changing ns of *cljs*
+(defun clojurescript-compile-defun ()
+  (interactive)
+  (let* ((cljs-defun (cljs-defun-at-point))
+	 (cljs-namespace-command (concat "(in-ns '" (clojure-find-ns) ")"))
+	 (cljs-command (concat cljs-namespace-command " " cljs-defun)))
+    (comint-send-string (get-buffer-process clojurescript-repl-buffer-name) (concat cljs-command "\n"))))
+
+;; TODO: make this function more generic by defining a project dir
+;; relative to the buffer's filename
+(defun compile-tags ()
+  "compile etags for the current project"
+  (interactive)
+  (let* ((cljs-project "/Users/james/clojure/lift-tab-client")
+	 (regex-file (concat cljs-project "/reg-ex.etag"))
+	 (tags-file  (concat cljs-project "/TAGS"))
+	 (etags-command (concat "find " cljs-project " -name '*.cljs' | xargs etags --regex=@" regex-file " -o " cljs-project "/TAGS")))
+    (shell-command etags-command)))
 
 
 (defun define-keys ()
+  (setq clojurescript-mode-map (make-sparse-keymap))
   (use-local-map clojurescript-mode-map)
-  (define-key clojurescript-mode-map (kbd "C-c C-z") 'clojurescript-switch-to-lisp))
-
+  (define-key clojurescript-mode-map (kbd "C-c C-z") 'clojurescript-switch-to-lisp)
+  (define-key clojurescript-mode-map (kbd "C-c C-t") 'compile-tags)
+  (define-key clojurescript-mode-map (kbd "C-c C-c") 'clojurescript-compile-defun)
+  (define-key clojurescript-mode-map (kbd "M-.") 'find-tag))
+  ;; remap is the slime-compile-defun to my own clojurescript-compile-defun
+  ;; see http://www.gnu.org/software/emacs/manual/html_node/elisp/Remapping-Commands.html
+  ;; for more info
+  ;;(define-key clojurescript-mode-map [remap slime-compile-defun] 'clojurescript-compile-defun)
+  ;;(define-key clojurescript-mode-map [remap slime-edit-definition] 'find-tag))
 
 ;;;###autoload
 (define-derived-mode clojurescript-mode clojure-mode "ClojureScript"
   "Major mode for ClojureScript"
-  (setup-inf-lisp-buffer)        
+  (setup-inf-lisp-buffer)
   (define-keys)
   (add-hook 'inferior-lisp-mode-hook 'inf-lisp-mode-hook nil 't)
+  (add-hook 'clojurescript-mode-hook 'cljs-disable-slime)
+  ;; turn off slime mode, which is in 'clojure-mode-hook
   (make-local-variable 'inferior-lisp-program)
-  (setq inferior-lisp-program (cljs-repl-command))
-
-  (when (functionp 'slime-mode)
-    (slime-mode -1)))
-
+  (setq inferior-lisp-program (cljs-repl-command)))
+;; slime is no longer needed and re-binds keys that interfere with my setup
+;; (when (functionp 'slime-mode)
+;;   (slime-mode -1))
 
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.cljs$" . clojurescript-mode))
@@ -109,8 +150,6 @@
 (provide 'clojurescript-mode)
 
 ;;Hooks
-
-
 
 (defun inf-lisp-mode-hook ()
   (let ((cur-buf (current-buffer)))
@@ -127,8 +166,10 @@
              (set-process-buffer inf-lisp-proc nil)
              (kill-process inf-lisp-proc)
              (kill-buffer cur-buf))))))
-          
 
+(defun cljs-disable-slime ()
+  (if (and (boundp 'slime-mode) slime-mode)
+      (slime-mode -1)))
  
   ;;     (if (not (get-buffer clojurescript-repl-buffer-name))
           
@@ -143,3 +184,4 @@
           
 
 ;;; clojurescript-mode.el ends here
+

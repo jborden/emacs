@@ -27,5 +27,11 @@
 ;; A raw prefix argument is what you get from `(interactive "P")'.
 ;;Its numeric meaning is what you would get from `(interactive "p")'.
 
+;; sort-symbols from http://www.emacswiki.org/emacs/SortWords
+(defun sort-symbols (reverse beg end)
+      "Sort symbols in region alphabetically, in REVERSE if negative.
+    See `sort-words'."
+      (interactive "*P\nr")
+      (sort-regexp-fields reverse "\\(\\sw\\|\\s_\\)+" "\\&" beg end))
 
 

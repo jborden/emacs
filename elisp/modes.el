@@ -50,5 +50,9 @@
 (require 'slime)
 (slime-setup)
 ;; uses paraedit mode on lisps
-(add-hook 'clojure-mode 'paredit-mode)
+;;(add-hook 'clojure-mode 'paredit-mode)
+;;(add-hook 'slime-repl-mode-hook ')
+;; I don't like paredit mode, I just use electric-pair-mode, which
+;; by default works on all buffers
+(electric-pair-mode)
 
