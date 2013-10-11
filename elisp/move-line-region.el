@@ -53,3 +53,9 @@
 
 (global-set-key (kbd "M-<up>") 'move-line-region-up)
 (global-set-key (kbd "M-<down>") 'move-line-region-down)
+
+;; redefine these keys in paredit mode so that I can still move regions of text with 
+;; M-<up> and M-<down>
+(eval-after-load 'paredit
+  '(progn (define-key paredit-mode-map (kbd "M-<up>") 'move-line-region-up)
+	  (define-key paredit-mode-map (kbd "M-<down>") 'move-line-region-down)))
