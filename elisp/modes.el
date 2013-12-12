@@ -55,4 +55,6 @@
 ;; I don't like paredit mode, I just use electric-pair-mode, which
 ;; by default works on all buffers
 (electric-pair-mode)
-
+;; hooks for rainbow-delimiters
+(add-hook 'clojure-mode-hook 'rainbow-delimiters-mode)
+(add-hook 'clojurescript-mode-hook 'rainbow-delimiters-mode)
