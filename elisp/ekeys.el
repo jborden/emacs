@@ -10,8 +10,12 @@
 ;; Set C-l to goto-line
 (global-set-key "\C-l" 'goto-line)
 ;; Set C-x C
-(global-set-key "\C-x p" 'other-window-backward)
+;;(global-set-key "\C-x\p" 'other-window-backward)
 ;; Scroll forward with C-f
 (global-set-key "\C-f" 'scroll-up-command)
 ;; Scroll backward with C-b
 (global-set-key "\C-b" 'scroll-down-command)
+;; unset iconify-frame (minimize) to a less commonly hit key
+;; the problem is that cider will crash emacs if minimized
+(global-unset-key (kbd "s-m")) ; s is "super key" e.g. Command (⌘) on macs
+

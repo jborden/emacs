@@ -34,4 +34,23 @@
       (interactive "*P\nr")
       (sort-regexp-fields reverse "\\(\\sw\\|\\s_\\)+" "\\&" beg end))
 
+;; from http://www.emacswiki.org/emacs/RevertBuffer#toc2
+(defun revert-all-buffers ()
+    "Refreshes all open buffers from their respective files."
+    (interactive)
+    (dolist (buf (buffer-list))
+      (with-current-buffer buf
+        (when (and (buffer-file-name) (file-exists-p (buffer-file-name)) (not (buffer-modified-p)))
+          (revert-buffer t t t) )))
+    (message "Refreshed open files.") )
 
+
+;; (defun indent-buffer-and-indent ()
+;;   "Indent the currently visited buffer"
+;;   (interactive)
+;;   (indent-region (point-min) (point-max))
+;;   (indent-according-to-mode))
+
+
+(eval-after-load 'clojure-mode
+  '(define-key clojure-mode-map [(tab)] 'paredit-reindent-defun))

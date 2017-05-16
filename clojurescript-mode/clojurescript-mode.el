@@ -52,8 +52,11 @@
 )
 
 (defun cljs-repl-command () 
-  (concat "lein2 trampoline cljsbuild " 
-        clojurescript-repl-type))
+  ;; (concat "lein2 trampoline cljsbuild " 
+  ;;       clojurescript-repl-type))
+  ;; (concat "lein21 trampoline run -m clojure.main src/hello_world/node_repl.clj")
+  (concat "lein25 trampoline cljsbuild repl-listen")
+  )
 
 
 (defun setup-inf-lisp-buffer ()  
@@ -110,11 +113,17 @@
 (defun compile-tags ()
   "compile etags for the current project"
   (interactive)
-  (let* ((cljs-project "/Users/james/clojure/lift-tab-client")
-	 (regex-file (concat cljs-project "/reg-ex.etag"))
-	 (tags-file  (concat cljs-project "/TAGS"))
-	 (etags-command (concat "find " cljs-project " -name '*.cljs' | xargs etags --regex=@" regex-file " -o " cljs-project "/TAGS")))
-    (shell-command etags-command)))
+  (let* (
+	 ;; file-name-as-directory will always print a dir with leading slash
+	 (cljs-project  (expand-file-name (read-directory-name "project dir: ")))
+	 ;;(regex-file (concat cljs-project "reg-ex.etag"))
+	 (regex-pattern1 "'/[ \\t\\(]*def[a-z]* \\([a-z-!]+\\)/\\1/'") ; any kind of def*
+	 (regex-pattern2 "'/[ \t\(]*ns \([a-z.]+\)/\1/'")              ; namespace
+	 (tags-file  (concat cljs-project "TAGS"))
+	 (etags-command (concat "find " cljs-project " -name '*.cljs' | xargs etags --regex=" regex-pattern1 " --regex=" regex-pattern2 " -o " cljs-project "TAGS")))
+    (shell-command etags-command)
+    ;(print etags-command)
+    ))
 
 
 (defun define-keys ()
@@ -146,7 +155,6 @@
 
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.cljs$" . clojurescript-mode))
-
 (provide 'clojurescript-mode)
 
 ;;Hooks

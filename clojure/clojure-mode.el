@@ -183,7 +183,7 @@ if that value is non-nil."
          'clojure-forward-sexp))
   (set (make-local-variable 'lisp-doc-string-elt-property)
        'clojure-doc-string-elt)
-  (set (make-local-variable 'inferior-lisp-program) "lein repl")
+  (set (make-local-variable 'inferior-lisp-program) "lein21 repl")
   (set (make-local-variable 'parse-sexp-ignore-comments) t)
 
   (clojure-mode-font-lock-setup)
@@ -967,7 +967,7 @@ returned."
 
 ;; Pipe to $SHELL to work around mackosecks GUI Emacs $PATH issues.
 (defcustom clojure-swank-command
-  (if (or (locate-file "lein" exec-path) (locate-file "lein.bat" exec-path))
+  (if (or (locate-file "lein21" exec-path) (locate-file "lein.bat" exec-path))
       "lein jack-in %s"
     "echo \"lein jack-in %s\" | $SHELL -l")
   "The command used to start swank via clojure-jack-in.

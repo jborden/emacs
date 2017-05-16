@@ -37,9 +37,11 @@
 (add-to-list 'auto-mode-alist '("\\.js" . javascript-mode))
 ;; Use four spaces for tabs 
 (setq tab-width 4)
-(setq indent-tabs-mode t)
+(setq indent-tabs-mode nil)
 ;; use octave-mode for *.m files
 (add-to-list 'auto-mode-alist '("\\.m" . octave-mode))
+;; use markdownmode for *.md files
+(add-to-list 'auto-mode-alist '("\\.md" . markdown-mode))
 ;; use my own javac minor mode when loading java files
 (add-hook 'java-mode-hook 'javac-mode)
 ;; use rainbow mode when editing css files
@@ -58,3 +60,5 @@
 ;; hooks for rainbow-delimiters
 (add-hook 'clojure-mode-hook 'rainbow-delimiters-mode)
 (add-hook 'clojurescript-mode-hook 'rainbow-delimiters-mode)
+;; hook for paredit for cider repl
+(add-hook 'cider-repl-mode-hook #'paredit-mode)
